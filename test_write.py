@@ -16,5 +16,7 @@ ser.timeout = None
 # ser_bytes = ser.readline()
 # print(ser_bytes)
 while True:
-    ser.write(b'ping\n')
-    time.sleep(1)
+    if (command := input()):
+        ser.write(str.encode(command + '\n', "utf-8"))
+        print("Sent!")
+        time.sleep(1)
