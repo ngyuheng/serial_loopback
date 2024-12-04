@@ -31,7 +31,6 @@ class SerialComm:
         except serial.SerialException as e:
             print(f"Error initializing serial port: {e}")
             self.ser = None
-        
         self.command_map = {
             b'ping': self.do_ping,
         }

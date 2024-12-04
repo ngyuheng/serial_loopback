@@ -1,22 +1,52 @@
 import serial
 import time
 
-# Pyserial Docs: https://pyserial.readthedocs.io/en/latest/shortintro.html
+import serial
+import time
 
-# You may configure the HC-12 433MHz transceiver using the datasheet below
-# https://statics3.seeedstudio.com/assets/file/bazaar/product/HC-12_english_datasheets.pdf
+def main():
+    # Configure the serial port
+    try:
+        ser = serial.Serial('COM6', baudrate=9600, timeout=None)
+        print("Serial connection established. Type 'exit' to quit.")
+    except serial.SerialException as e:
+        print(f"Error opening serial port: {e}")
+        return
 
-# Connects to a 433MHz joined to a UART USB Bridge at COM8 (for example)
-# This 433MHz transceiver is in-charge of sending signals out
-# Check using Device Manager which is the COM port
-ser = serial.Serial('COM3')
-ser.baudrate = 9600 # Baud Rate configured in the HC-12, refer to datasheet to set
-ser.timeout = None
+    while True:
+        try:
+            # Prompt user for hex input
+            hex_input = input("Enter Hex Values (comma-separated, e.g., '2A,00,00,00'): ").strip()
+            
+            if hex_input.lower() == 'exit':  # Allow the user to exit the loop
+                print("Exiting...")
+                break
+            
+            try:
+                # Convert the hex string into raw bytes
+                hex_values = hex_input.split(", ")
+                byte_data = bytes(int(h, 16) for h in hex_values)
+                # add a newline character to the end of the byte data
+                byte_data += b'\r\n'
+            except ValueError:
+                print("Invalid hex input! Ensure values are valid hex codes separated by commas.")
+                continue
+            
+            # Send the binary data over serial
+            ser.write(byte_data)
+            print(f"Sent {len(byte_data)} bytes: {byte_data}")
+            
+            time.sleep(1)  # Adjust delay if needed
+            
+        except KeyboardInterrupt:
+            print("\nExiting...")
+            break
+        except Exception as e:
+            print(f"Error: {e}")
+    
+    # Clean up
+    ser.close()
+    print("Serial connection closed.")
 
-# ser_bytes = ser.readline()
-# print(ser_bytes)
-while True:
-    if (command := input()):
-        ser.write(str.encode(command + '\n', "utf-8"))
-        print("Sent!")
-        time.sleep(1)
+if __name__ == "__main__":
+    main()
